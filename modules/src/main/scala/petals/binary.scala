@@ -82,24 +82,23 @@ object binary:
     * `cons` does O(1) work per digit, and `consTree` does O(log n) work, so `cons` is O(log n) worst case.
     */
   def cons[A](a: A, list: RList[A]): RList[A] =
-    def consTree[A](tree: Tree[A], list: RList[A]): RList[A] = list match {
+    def consTree[A](tree: Tree[A], list: RList[A]): RList[A] = list match
       case Nil                        => List(Digit.One(tree))
       case Digit.Zero :: rest         => Digit.One(tree) :: rest
       case Digit.One(subtree) :: rest => Digit.Zero :: consTree(link(tree, subtree), rest)
-    }
+
     consTree(Tree.Leaf(a), list)
 
   /** When applied to a list whose first digit has rank r, `unconsTree` returns a pair containing a tree of rank r, and
     * the new list without that tree. `unconsTree` follows the rules of decrementing a binary number
     */
-  def unConsTree[A](list: RList[A]): (Tree[A], RList[A]) = list match {
+  def unConsTree[A](list: RList[A]): (Tree[A], RList[A]) = list match
     case Nil                  => (Tree.Empty, Nil)
     case Digit.One(t) :: Nil  => (t, Nil)
     case Digit.One(t) :: rest => (t, Digit.Zero :: rest)
     case Digit.Zero :: rest =>
       val (Tree.Node(_, t1, t2), rest1) = unConsTree(rest): @unchecked
       (t1, Digit.One(t2) :: rest1)
-  }
 
   /** `head` and `tail` perform O(1) work per digit, and so run in O(log n) worst case time
     */
