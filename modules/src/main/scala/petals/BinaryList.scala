@@ -32,7 +32,7 @@ object binarylist:
     * the new list without that tree. `unconsTree` follows the rules of decrementing a binary number
     */
   def unConsTree[A](list: BinaryList[A]): (Tree[A], BinaryList[A]) = list match
-    case Nil            => (Empty, Nil)
+    case Nil            => throw new Exception("Index out of bounds")
     case One(t) :: Nil  => (t, Nil)
     case One(t) :: rest => (t, Zero :: rest)
     case Zero :: rest =>

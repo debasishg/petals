@@ -63,6 +63,7 @@ object RandomAccessListBinaryList:
       def head: A =
         val (Tree.Leaf(x), _) = unConsTree(fa): @unchecked
         x
+
       def tail: BinaryList[A] =
         val (_, rest) = unConsTree(fa): @unchecked
         rest
