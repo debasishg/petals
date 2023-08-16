@@ -1,5 +1,6 @@
 package petals
 
+// typeclass
 trait RandomAccessList[F[+_]]:
   extension [A](fa: F[A])
     def isEmpty: Boolean
