@@ -23,7 +23,8 @@ object RandomAccessListZerolessBinaryList:
         case Nil                  => throw new Exception("Index out of bounds")
         case One(Leaf(x)) :: _    => x
         case Two(Leaf(x), _) :: _ => x
-        case _                    => throw new Exception("Invariant violated: first digit is zero")
+        case _                    => throw new Exception("Invariant violated: the first digit needs to be a Leaf")
+
       def tail: BinaryList[A] =
         val (_, rest) = unConsTree(fa): @unchecked
         rest
@@ -32,7 +33,7 @@ object RandomAccessListZerolessBinaryList:
         * Assume lookup for position i is found in level k. Then we have: 1 + 2 + 4 + .. + 2^(k-1) < i, which implies
         * summing the GP series on the left 2^k - 1 < i, which implies 2^k < i + 1, which implies k < log(i + 1). Now
         * the size of the tree is 2^k - 1 and the looked up node is at depth k, so the total work done is O(log i). This
-        * is an improvement over O(log n) for `lookup` and `update` with binary representation
+        * is an improvement over O(log n) for `lookup` and `update` with binary representation (Exercise 9.6)
         */
       def lookup(i: Int): A = fa match
         case Nil => throw new Exception("Index out of bounds")
