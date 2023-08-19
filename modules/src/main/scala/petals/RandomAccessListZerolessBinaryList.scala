@@ -28,8 +28,12 @@ object RandomAccessListZerolessBinaryList:
         val (_, rest) = unConsTree(fa): @unchecked
         rest
 
-        /** `lookup` and `update` run in O(log i) worst case time, where i is the index of the element being accessed.
-          */
+      /** `lookup` and `update` run in O(log i) worst case time, where i is the index of the element being accessed.
+        * Assume lookup for position i is found in level k. Then we have: 1 + 2 + 4 + .. + 2^(k-1) < i, which implies
+        * summing the GP series on the left 2^k - 1 < i, which implies 2^k < i + 1, which implies k < log(i + 1). Now
+        * the size of the tree is 2^k - 1 and the looked up node is at depth k, so the total work done is O(log i). This
+        * is an improvement over O(log n) for `lookup` and `update` with binary representation
+        */
       def lookup(i: Int): A = fa match
         case Nil => throw new Exception("Index out of bounds")
         case One(t) :: rest =>
