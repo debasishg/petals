@@ -89,3 +89,18 @@ object RandomAccessListBinaryList:
         case Digit.One(t) :: rest =>
           if (i < t.size) Digit.One(updateTree(i, a, t)) :: rest
           else Digit.One(t) :: rest.update(i - t.size)(a)
+
+object App {
+  import binarylist.*
+  import Digit.*
+  import Tree.*
+  import RandomAccessListBinaryList.{ *, given }
+
+  @main def main() =
+    val b: BinaryList[Int] =
+      List(Zero, One(Leaf(1)), Zero, One(Node(2, Leaf(2), Leaf(3))), Zero, One(Leaf(4)), One(Leaf(5)))
+    println(b.lookup(0)) // 1
+    println(b.lookup(1)) // 1
+    println(b.lookup(3)) // 1
+
+}

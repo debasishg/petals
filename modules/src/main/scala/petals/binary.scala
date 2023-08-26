@@ -15,6 +15,7 @@ object binary:
       case One :: rest      => Zero :: rest
       case Zero :: rest     => One :: dec(rest) // borrow
 
+// Exercise 9.4
 object zerolessBinary:
   enum Digit:
     case One

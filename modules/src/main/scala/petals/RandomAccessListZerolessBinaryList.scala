@@ -5,6 +5,7 @@ import Digit.*
 import Tree.*
 
 // implementation of typeclass `RandomAccessList` for `ZerolessBinaryList`
+// Exercise 9.5
 object RandomAccessListZerolessBinaryList:
   given RandomAccessList[BinaryList] with
     extension [A](fa: BinaryList[A])
