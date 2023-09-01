@@ -1,4 +1,4 @@
-package petals
+package petals.ch9
 
 object binary:
   enum Digit:
