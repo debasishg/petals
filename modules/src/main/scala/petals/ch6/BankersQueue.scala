@@ -1,4 +1,5 @@
-package petals.ch7
+package petals
+package ch6
 
 object bankersQueue:
   class BankersQueue[A] private (

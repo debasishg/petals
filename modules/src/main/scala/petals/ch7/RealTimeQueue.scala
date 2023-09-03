@@ -1,4 +1,7 @@
-package petals.ch7
+package petals
+package ch7
+
+import ch6.Queue
 
 object realTimeQueue:
   class RealTimeQueue[A] private (
