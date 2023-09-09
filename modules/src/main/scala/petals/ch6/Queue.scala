@@ -1,7 +1,6 @@
 package petals
 package ch6
 
-// typeclass
 trait Queue[A]:
   def head: A
   def tail: Queue[A]
