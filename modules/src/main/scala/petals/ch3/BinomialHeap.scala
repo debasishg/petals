@@ -12,13 +12,16 @@ object binomialHeap:
 
     override def empty = new BinomialHeap[A](Nil)
 
-    override def merge(other: BinomialHeap[A]): BinomialHeap[A] = (impl, other.impl) match {
-      case (Nil, _) => other
-      case (_, Nil) => this
-      case (t1 :: ts1, t2 :: ts2) =>
-        if (rank(t1) < rank(t2)) new BinomialHeap(t1 :: impl).merge(other)
-        else if (rank(t2) < rank(t1)) merge(other)
-        else new BinomialHeap(link(t1, t2) :: ts1).merge(new BinomialHeap(ts2))
+    override def merge(other: BinomialHeap[A]): BinomialHeap[A] =
+      new BinomialHeap(merge(impl, other.impl))
+
+    private def merge(one: List[Tree[A]], two: List[Tree[A]]): List[Tree[A]] = (one, two) match {
+      case (Nil, _) => two
+      case (_, Nil) => one
+      case (ts1 @ (t1 :: ts11), ts2 @ (t2 :: ts22)) =>
+        if (rank(t1) < rank(t2)) t1 :: merge(ts11, ts2)
+        else if (rank(t2) < rank(t1)) t2 :: merge(ts1, ts22)
+        else link(t1, t2) :: merge(ts11, ts22)
     }
 
     override def deleteMin = {
