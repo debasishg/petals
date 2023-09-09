@@ -23,12 +23,27 @@ object binomialHeap:
 
     override def deleteMin = {
       val (Node(_, _, ts1), ts2) = removeMinTree(impl): @unchecked
-      new BinomialHeap[A](ts1.reverse ++ ts2)
+      new BinomialHeap(ts1.reverse).merge(new BinomialHeap(ts2))
     }
 
-    override def findMin: A = {
-      val (t, _) = removeMinTree(impl)
+    override def findMin: A = findMin(impl)
+
+    private def findMin(trees: List[Tree[A]]): A = {
+      val (t, _) = removeMinTree(trees)
       root(t)
+    }
+
+    /** Exercise 3.5: A direct implementation of `findMin` that does not use `removeMinTree`.
+      */
+    def findMinDirect: A = findMinDirect(impl)
+
+    private def findMinDirect(trees: List[Tree[A]]): A = trees match {
+      case Nil     => throw new Exception("Empty heap")
+      case List(t) => root(t)
+      case t :: ts =>
+        val min = findMinDirect(ts)
+        if (implicitly[Ordering[A]].lteq(root(t), min)) root(t)
+        else min
     }
 
     override def isEmpty: Boolean = impl.isEmpty
