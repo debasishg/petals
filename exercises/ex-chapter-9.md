@@ -1,4 +1,4 @@
-**Exercise 9.8**
+## Exercise 9.8
 
 Using redundant binary representation we have `Zero`, `One` and `Two`. Here `Zero` and `Two` are considered unsafe, while `One` is safe. Hence we allocate the debit invariant as `1` debit for `One` and `0` debits for `Zero` or `Two`
 
