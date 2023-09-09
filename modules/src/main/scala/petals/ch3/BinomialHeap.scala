@@ -6,6 +6,8 @@ object binomialHeap:
     case Empty                                             extends Tree[Nothing]
 
   import Tree.*
+  import BinomialHeap.*
+
   class BinomialHeap[A: Ordering](
       private val impl: List[Tree[A]]
   ) extends Heap[A, BinomialHeap[A]]:
@@ -56,13 +58,14 @@ object binomialHeap:
       */
     override def insert(a: A) = new BinomialHeap[A](insTree(Node(0, a, Nil), impl))
 
-    private def insTree(t: Tree[A], ts: List[Tree[A]]): List[Tree[A]] = ts match
+  object BinomialHeap:
+    private def insTree[A: Ordering](t: Tree[A], ts: List[Tree[A]]): List[Tree[A]] = ts match
       case Nil => List(t)
       case tp :: ts =>
         if (rank(t) < rank(tp)) t :: ts
         else insTree(link(t, tp), ts.tail)
 
-    private def removeMinTree(ts: List[Tree[A]]): (Tree[A], List[Tree[A]]) = ts match
+    private def removeMinTree[A: Ordering](ts: List[Tree[A]]): (Tree[A], List[Tree[A]]) = ts match
       case Nil => throw new Exception("Empty heap")
       case t :: Nil =>
         (t, Nil)
@@ -71,16 +74,16 @@ object binomialHeap:
         if (implicitly[Ordering[A]].lteq(root(t), root(t1))) (t, ts)
         else (t1, t :: ts1)
 
-    private def link(t1: Tree[A], t2: Tree[A]): Tree[A] = (t1, t2) match
+    private def link[A: Ordering](t1: Tree[A], t2: Tree[A]): Tree[A] = (t1, t2) match
       case (Node(r, x1, c1), Node(_, x2, c2)) =>
         if (implicitly[Ordering[A]].lteq(x1, x2)) Node(r + 1, x1, t2 :: c1)
         else Node(r + 1, x2, t1 :: c2)
       case _ => throw new Exception("Cannot link empty trees")
 
-    private def rank(t: Tree[A]): Int = t match
+    private def rank[A](t: Tree[A]): Int = t match
       case Tree.Empty            => 0
       case Tree.Node(rank, _, _) => rank
 
-    private def root(t: Tree[A]): A = t match
+    private def root[A](t: Tree[A]): A = t match
       case Tree.Empty            => throw new Exception("Empty tree")
       case Tree.Node(_, elem, _) => elem

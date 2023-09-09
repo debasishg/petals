@@ -1,5 +1,7 @@
 ## Exercise 5.2
 
+**Show `insert` is O(1) amortized:**
+
 Assume initial credits is the number of trees in the heap, say `t`. Now a call to `insert` takes `k + 1` steps and we have `k` `link`s. Since we had `t` trees before `insert`, after `insert` we have number of trees = `t - k + 1`, which is also the number of credits. Change in credit = `(t - k + 1) - t` = `1 - k`. Hence amortized cost = actual cost + change in credit = `(k + 1) + (1 - k)` = `2` = O(1)
 
 ## Exercise 5.3
