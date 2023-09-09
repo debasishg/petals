@@ -51,6 +51,9 @@ object binomialHeap:
 
     override def isEmpty: Boolean = impl.isEmpty
 
+    /** Worst case is inserting into a heap of size 2^k - 1, which requires k `link`s and O(k) = O(log n). Hence worst
+      * case complexity of `insert` is O(log n)
+      */
     override def insert(a: A) = new BinomialHeap[A](insTree(Node(0, a, Nil), impl))
 
     private def insTree(t: Tree[A], ts: List[Tree[A]]): List[Tree[A]] = ts match
