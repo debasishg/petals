@@ -1,4 +1,5 @@
-package petals.misc
+package petals
+package misc
 
 object Susp {
   def apply[T](x: => T): Susp[T]                              = new Susp(x)

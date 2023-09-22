@@ -1,7 +1,8 @@
-package petals.ch6
+package petals
+package ch6
 
-import petals.ch3.Heap
-import petals.misc.Susp
+import ch3.Heap
+import misc.Susp
 
 object lazyBinomialHeap:
   enum Tree[+A]:

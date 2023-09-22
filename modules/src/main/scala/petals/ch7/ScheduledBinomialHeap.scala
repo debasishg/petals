@@ -1,6 +1,7 @@
-package petals.ch7
+package petals
+package ch7
 
-import _root_.petals.ch3.Heap
+import ch3.Heap
 
 object scheduledBinomialHeap:
   enum Tree[+A]:
@@ -16,22 +17,31 @@ object scheduledBinomialHeap:
 
   import Tree.*
   import Digit.*
+  import ScheduledBinomialHeap.*
 
   class ScheduledBinomialHeap[A: Ordering](
       private val impl: Repr[A]
   ) extends Heap[A, ScheduledBinomialHeap[A]]:
 
+    /** `insert` runs in O(1) worst case time, as opposed to O(1) amortized time in `LazyBinomialHeap` in chapter 6
+      */
     override def insert(a: A): ScheduledBinomialHeap[A] =
       val (ds, sched) = impl
       val ds1         = insTree(Node(a, Nil), ds)
       new ScheduledBinomialHeap[A]((ds1, exec(exec(ds1 :: sched))))
 
+    /** `deleteMin` and `merge` evaluate every suspension in the system using `force` on the `Stream` and set the
+      * `Schedule` to `Nil`. Okasaki uses a function `normalize` to do the same in PFDS
+      */
     override def deleteMin: ScheduledBinomialHeap[A] =
       val (ds, _)           = impl
       val (Node(_, c), ds1) = removeMinTree(ds): @unchecked
       val ds2               = mrgWithList(c.reverse, ds1)
       new ScheduledBinomialHeap[A]((ds2.force, Nil))
 
+    /** `merge`, `findMin` and `deleteMin` runs in O(log n) worst case, as there cannot be any heap with more than O(log
+      * n) suspensions at any point in time (Theorem 7.1)
+      */
     override def merge(other: ScheduledBinomialHeap[A]): ScheduledBinomialHeap[A] =
       val ((ds1, _), (ds2, _)) = (impl, other.impl)
       val ds                   = mrg(ds1, ds2)
@@ -48,18 +58,20 @@ object scheduledBinomialHeap:
 
     override def empty = new ScheduledBinomialHeap[A](Stream.Empty, Nil)
 
-    private def insTree(t: Tree[A], ts: Stream[Digit[A]]): Stream[Digit[A]] = ts match
+  object ScheduledBinomialHeap:
+
+    private def insTree[A: Ordering](t: Tree[A], ts: Stream[Digit[A]]): Stream[Digit[A]] = ts match
       case Stream.Empty   => Stream(One(t))
       case Zero #:: ds    => One(t) #:: ds
       case One(t1) #:: ds => Zero #:: insTree(link(t, t1), ds)
       case _              => ???
 
-    private def link(t1: Tree[A], t2: Tree[A]): Tree[A] = (t1, t2) match
+    private def link[A: Ordering](t1: Tree[A], t2: Tree[A]): Tree[A] = (t1, t2) match
       case (Node(x1, c1), Node(x2, c2)) =>
         if (implicitly[Ordering[A]].lteq(x1, x2)) Node(x1, t2 :: c1) else Node(x2, t1 :: c2)
       case _ => throw new Exception("Cannot link empty trees")
 
-    private def mrg(a: Stream[Digit[A]], b: Stream[Digit[A]]): Stream[Digit[A]] = (a, b) match
+    private def mrg[A: Ordering](a: Stream[Digit[A]], b: Stream[Digit[A]]): Stream[Digit[A]] = (a, b) match
       case (ds1, Stream.Empty)                => ds1
       case (Stream.Empty, ds2)                => ds2
       case (Zero #:: ds1, d #:: ds2)          => d #:: mrg(ds1, ds2)
@@ -70,19 +82,19 @@ object scheduledBinomialHeap:
     /** Exercise 7.4: Write an efficient, specialized version of `mrg`, called `mrgWithList`, so that `deleteMin` can
       * call `mrgWithList(rev c, ds')` instead of `mrg (listToStream(map ONE (rev c)), ds')`
       */
-    def mrgWithList(a: List[Tree[A]], b: Stream[Digit[A]]): Stream[Digit[A]] = (a, b) match
+    private def mrgWithList[A: Ordering](a: List[Tree[A]], b: Stream[Digit[A]]): Stream[Digit[A]] = (a, b) match
       case (Nil, ds2)                   => ds2
       case (ds1, Stream.Empty)          => ds1.map(One[A]).toStream
       case (d :: ds1, Zero #:: ds2)     => One(d) #:: mrgWithList(ds1, ds2)
       case (t1 :: ds1, One(t2) #:: ds2) => Zero #:: insTree(link(t1, t2), mrgWithList(ds1, ds2))
       case _                            => ???
 
-    private def exec(schedule: Schedule[A]): Schedule[A] = schedule match
+    private def exec[A](schedule: Schedule[A]): Schedule[A] = schedule match
       case Nil                     => Nil
       case (Zero #:: job) :: sched => job :: sched
       case _ :: sched              => sched
 
-    private def removeMinTree(ds: Stream[Digit[A]]): (Tree[A], Stream[Digit[A]]) = ds match
+    private def removeMinTree[A: Ordering](ds: Stream[Digit[A]]): (Tree[A], Stream[Digit[A]]) = ds match
       case Stream.Empty              => throw new Exception("removeMinTree on empty heap")
       case (One(t) #:: Stream.Empty) => (t, Stream.Empty)
       case (Zero #:: dss) =>
