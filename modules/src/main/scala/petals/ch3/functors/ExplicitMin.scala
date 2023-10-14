@@ -1,12 +1,14 @@
 package petals.ch3
 package functors
 
+// format: off
 /** Scala representation of the OCaml functor from https://gist.github.com/debasishg/6c016d35f9b726fed5cf6b1a383eaeef.
   * Using the existential based implementation of modules that corresponds to functors and abstract data types. Also
   * inspired from https://github.com/yawaramin/scala-modules
   */
+// format: on
 object explicitMin:
-  class ExplicitMin[Elem](heap: Heap[Elem])(using ord: Ordering[Elem]) extends Heap[Elem]:
+  class ExplicitMin[Elem](private val heap: Heap[Elem])(using ord: Ordering[Elem]) extends Heap[Elem]:
     /** Representation which is abstract in `Heap`
       */
     sealed trait H
