@@ -1,4 +1,5 @@
 package petals.ch3
+package functors
 
 object binomialHeap:
   enum Tree[+A]:
@@ -8,55 +9,57 @@ object binomialHeap:
   import Tree.*
   import BinomialHeap.*
 
-  class BinomialHeap[A: Ordering](
-      private val impl: List[Tree[A]]
-  ) extends Heap[A, BinomialHeap[A]]:
+  class BinomialHeap[A: Ordering]() extends Heap[A]:
+    type H = List[Tree[A]]
 
-    override def empty = new BinomialHeap[A](Nil)
+    override def empty = Nil
 
-    override def merge(other: BinomialHeap[A]): BinomialHeap[A] =
-      new BinomialHeap(merge(impl, other.impl))
+    override def merge(other: H)(h: H): H =
+      _merge(other, h)
 
-    private def merge(one: List[Tree[A]], two: List[Tree[A]]): List[Tree[A]] = (one, two) match {
+    private def _merge(one: H, two: H): H = (one, two) match {
       case (Nil, _) => two
       case (_, Nil) => one
       case (ts1 @ (t1 :: ts11), ts2 @ (t2 :: ts22)) =>
-        if (rank(t1) < rank(t2)) t1 :: merge(ts11, ts2)
-        else if (rank(t2) < rank(t1)) t2 :: merge(ts1, ts22)
-        else link(t1, t2) :: merge(ts11, ts22)
+        if (rank(t1) < rank(t2)) t1 :: _merge(ts11, ts2)
+        else if (rank(t2) < rank(t1)) t2 :: _merge(ts1, ts22)
+        else link(t1, t2) :: _merge(ts11, ts22)
     }
 
-    override def deleteMin = {
-      val (Node(_, _, ts1), ts2) = removeMinTree(impl): @unchecked
-      new BinomialHeap(ts1.reverse).merge(new BinomialHeap(ts2))
+    override def deleteMin(h: H): H = {
+      val (Node(_, _, ts1), ts2) = removeMinTree(h): @unchecked
+      merge(ts1.reverse)(ts2)
     }
 
-    override def findMin: A = findMin(impl)
+    override def findMin(h: H): A = _findMin(h)
 
-    private def findMin(trees: List[Tree[A]]): A = {
+    private def _findMin(trees: H): A = {
       val (t, _) = removeMinTree(trees)
       root(t)
     }
 
-    /** Exercise 3.5: A direct implementation of `findMin` that does not use `removeMinTree`.
-      */
-    def findMinDirect: A = findMinDirect(impl)
+    /** Exercise 3.5: A direct implementation of `findMin` that does not use `removeMinTree`. */
+    def findMinDirect(h: H): A =
+      _findMinDirect(h)
 
-    private def findMinDirect(trees: List[Tree[A]]): A = trees match {
-      case Nil     => throw new Exception("Empty heap")
-      case List(t) => root(t)
-      case t :: ts =>
-        val min = findMinDirect(ts)
-        if (implicitly[Ordering[A]].lteq(root(t), min)) root(t)
-        else min
+    private def _findMinDirect(trees: H): A =
+      trees match {
+        case Nil     => throw new Exception("Empty heap")
+        case List(t) => root(t)
+        case t :: ts =>
+          val min = findMinDirect(ts)
+          if (implicitly[Ordering[A]].lteq(root(t), min)) root(t) else min
+      }
+
+    override def isEmpty(h: H): Boolean = h match {
+      case Nil => true
+      case _   => false
     }
-
-    override def isEmpty: Boolean = impl.isEmpty
 
     /** Worst case is inserting into a heap of size 2^k - 1, which requires k `link`s and O(k) = O(log n). Hence worst
       * case complexity of `insert` is O(log n)
       */
-    override def insert(a: A) = new BinomialHeap[A](insTree(Node(0, a, Nil), impl))
+    override def insert(a: A)(h: H) = insTree(Node(0, a, Nil), h)
 
   object BinomialHeap:
 
